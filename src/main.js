@@ -9,6 +9,10 @@ import TypeNav from "./pages/TypeNav";
 Vue.component(TypeNav.name, TypeNav);
 Vue.use(VueRouter);
 
+// // 測試;
+// import { reqCategoryList } from "./api";
+// reqCategoryList();
+
 Vue.config.productionTip = false;
 new Vue({
   render: (h) => h(App),
