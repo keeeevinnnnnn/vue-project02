@@ -3,7 +3,7 @@ import { reqCategoryList } from "../../api";
 const state = {};
 const mutations = {};
 const actions = {
-  categoryLise() {
+  categoryList() {
     let result = reqCategoryList();
     console.log(result);
   },
