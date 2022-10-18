@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import TypeNav from "./TypeNav.vue";
+import TypeNav from "../components/TypeNav.vue";
 import ListContainer from "./ListContainer.vue";
 import Recommend from "./Recommend.vue";
 import Rank from "./Rank.vue";
