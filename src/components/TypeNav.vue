@@ -1,55 +1,26 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <div @mouseleave="leaveShow">
-        <h2 class="all" @mouseenter="changeShow">全部商品分類</h2>
+      <div>
+        <h2 class="all">全部商品分類</h2>
         <!-- 三级联动结构||过渡动画效果-->
         <transition name="sort">
-          <div class="sort" v-show="show">
+          <div class="sort">
             <!-- 事件的委派更加合理一些 -->
-            <div class="all-sort-list2" @click="goSearch">
-              <div
-                class="item"
-                v-for="(c1, index) in categoryList"
-                :key="c1.categoryId"
-                @mouseenter="changeIndex(index)"
-              >
-                <h3 :class="{ show: currentIndex === index }">
-                  <a
-                    :data-categoryName="c1.categoryName"
-                    :data-category1Id="c1.categoryId"
-                    >{{ c1.categoryName }}</a
-                  >
+            <div class="all-sort-list2">
+              <div class="item">
+                <h3>
+                  <a></a>
                 </h3>
-                <div
-                  class="item-list clearfix"
-                  :style="{
-                    display: currentIndex === index ? 'block' : 'none',
-                  }"
-                >
-                  <div
-                    class="subitem"
-                    v-for="(c2, index) in c1.categoryChild"
-                    :key="c2.categoryId"
-                  >
+                <div class="item-list clearfix">
+                  <div class="subitem">
                     <dl class="fore">
                       <dt>
-                        <a
-                          :data-categoryName="c2.categoryName"
-                          :data-category2Id="c2.categoryId"
-                          >{{ c2.categoryName }}</a
-                        >
+                        <a></a>
                       </dt>
                       <dd>
-                        <em
-                          v-for="(c3, index) in c2.categoryChild"
-                          :key="c3.categoryId"
-                        >
-                          <a
-                            :data-categoryName="c3.categoryName"
-                            :data-category3Id="c3.categoryId"
-                            >{{ c3.categoryName }}</a
-                          >
+                        <em>
+                          <a></a>
                         </em>
                       </dd>
                     </dl>
@@ -77,6 +48,10 @@
 <script>
 export default {
   name: "TypeNav",
+  mounted() {
+    // 通知vuex發請求，獲取數據，存儲在倉庫當中
+    this.$store.dispatch("categoryList");
+  },
 };
 </script>
 

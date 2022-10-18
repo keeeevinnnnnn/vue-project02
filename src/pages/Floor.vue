@@ -2,15 +2,11 @@
   <div class="floor">
     <div class="py-container">
       <div class="title clearfix">
-        <h3 class="fl">{{ floorInfo.name }}</h3>
+        <h3 class="fl"></h3>
         <div class="fr">
           <ul class="nav-tabs clearfix">
-            <li
-              :class="{ active: index === 0 }"
-              v-for="(nav, index) in floorInfo.navList"
-              :key="index"
-            >
-              <a href="#tab1" data-toggle="tab">{{ nav.text }}</a>
+            <li>
+              <a href="#tab1" data-toggle="tab"></a>
             </li>
           </ul>
         </div>
@@ -20,19 +16,12 @@
           <div class="floor-1">
             <div class="blockgary">
               <ul class="jd-list">
-                <li
-                  v-for="(keyword, index) in floorInfo.keywords"
-                  :key="index"
-                  :style="{ color: index % 2 != 0 ? 'cyan' : 'black' }"
-                >
-                  {{ keyword }}
-                </li>
+                <li></li>
               </ul>
-              <img :src="floorInfo.imgUrl" />
+              <img />
             </div>
             <div class="floorBanner">
               <!-- 轮播图的地方 -->
-              <Carousel :bannerList="floorInfo.carouselList" />
             </div>
             <div class="split">
               <span class="floor-x-line"></span>

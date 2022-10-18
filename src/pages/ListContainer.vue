@@ -3,7 +3,6 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--全局轮播图组件-->
-        <Carousel :bannerList="bannerList" />
       </div>
       <div class="right">
         <div class="news">
