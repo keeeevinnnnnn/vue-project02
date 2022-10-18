@@ -6,24 +6,35 @@
         <!-- 三级联动结构||过渡动画效果-->
         <transition name="sort">
           <div class="sort">
-            <!-- 事件的委派更加合理一些 -->
             <div class="all-sort-list2">
-              <div class="item">
-                <h3>
-                  <a></a>
+              <div
+                class="item"
+                v-for="(c1, index) in categoryList"
+                :key="c1.categoryId"
+                :class="{ cur: currentIndex == index }"
+              >
+                <h3 @mouseenter="changeIndex(index)" @mouseleave="leaveIndex()">
+                  <a href="">{{ c1.categoryName }}</a>
                 </h3>
                 <div class="item-list clearfix">
-                  <div class="subitem">
-                    <dl class="fore">
+                  <div
+                    class="subitem"
+                    v-for="(c2, index) in c1.categoryChild"
+                    :key="c2.categoryId"
+                  >
+                    <div class="fore">
                       <dt>
-                        <a></a>
+                        <a href="">{{ c2.categoryName }}</a>
                       </dt>
                       <dd>
-                        <em>
-                          <a></a>
+                        <em
+                          v-for="(c3, index) in c2.categoryChild"
+                          :key="c3.categoryId"
+                        >
+                          <a href="#">{{ c3.categoryName }}</a>
                         </em>
                       </dd>
-                    </dl>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -46,11 +57,37 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "TypeNav",
+  data() {
+    return {
+      // 存儲用戶鼠標位置
+      currentIndex: -1,
+    };
+  },
   mounted() {
     // 通知vuex發請求，獲取數據，存儲在倉庫當中
     this.$store.dispatch("categoryList");
+  },
+  computed: {
+    ...mapState({
+      // 右側需要的是一個函數，當使用這個計算屬性的時候，右側函數會立即執行一次
+      // 注入一個參數state，就是大倉庫的數據
+      categoryList: (state) => {
+        return state.home.categoryList;
+      },
+    }),
+  },
+  methods: {
+    // 鼠標進入修改響應式數據currentIndex數據
+    changeIndex(index) {
+      // index: 鼠標移上某一個元素分類的索引值
+      this.currentIndex = index;
+    },
+    leaveIndex() {
+      this.currentIndex = -1;
+    },
   },
 };
 </script>
@@ -174,6 +211,9 @@ export default {
               }
             }
           }
+        }
+        .cur {
+          background-color: lightblue;
         }
       }
     }
