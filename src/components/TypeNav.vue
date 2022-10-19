@@ -1,22 +1,31 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <div>
+      <div @mouseleave="leaveIndex()">
         <h2 class="all">全部商品分類</h2>
         <!-- 三级联动结构||过渡动画效果-->
         <transition name="sort">
-          <div class="sort">
-            <div class="all-sort-list2">
+          <div class="sort" v-show="show">
+            <div class="all-sort-list2" @click="goSearch">
               <div
                 class="item"
                 v-for="(c1, index) in categoryList"
                 :key="c1.categoryId"
+                @mouseenter="changeIndex(index)"
                 :class="{ cur: currentIndex == index }"
               >
-                <h3 @mouseenter="changeIndex(index)" @mouseleave="leaveIndex()">
-                  <a href="">{{ c1.categoryName }}</a>
+                <h3>
+                  <a
+                    :data-categoryName="c1.categoryName"
+                    :data-category1Id="c1.categoryId"
+                    >{{ c1.categoryName }}</a
+                  >
                 </h3>
-                <div class="item-list clearfix">
+                <!-- 二級與三級分類 -->
+                <div
+                  class="item-list clearfix"
+                  :style="{ display: currentIndex == index ? 'block' : 'none' }"
+                >
                   <div
                     class="subitem"
                     v-for="(c2, index) in c1.categoryChild"
@@ -24,14 +33,22 @@
                   >
                     <div class="fore">
                       <dt>
-                        <a href="">{{ c2.categoryName }}</a>
+                        <a
+                          :data-categoryName="c2.categoryName"
+                          :data-category2Id="c2.categoryId"
+                          >{{ c2.categoryName }}</a
+                        >
                       </dt>
                       <dd>
                         <em
                           v-for="(c3, index) in c2.categoryChild"
                           :key="c3.categoryId"
                         >
-                          <a href="#">{{ c3.categoryName }}</a>
+                          <a
+                            :data-categoryName="c3.categoryName"
+                            :data-category3Id="c3.categoryId"
+                            >{{ c3.categoryName }}</a
+                          >
                         </em>
                       </dd>
                     </div>
@@ -58,16 +75,19 @@
 
 <script>
 import { mapState } from "vuex";
+import _ from "lodash";
+console.log(_.throttle);
 export default {
   name: "TypeNav",
   data() {
     return {
       // 存儲用戶鼠標位置
       currentIndex: -1,
+      show: true,
     };
   },
   mounted() {
-    // 通知vuex發請求，獲取數據，存儲在倉庫當中
+    // 通知vuex發API，獲取數據，存儲在倉庫當中
     this.$store.dispatch("categoryList");
   },
   computed: {
@@ -81,12 +101,37 @@ export default {
   },
   methods: {
     // 鼠標進入修改響應式數據currentIndex數據
-    changeIndex(index) {
-      // index: 鼠標移上某一個元素分類的索引值
+    changeIndex: _.throttle(function (index) {
       this.currentIndex = index;
-    },
+    }, 50),
     leaveIndex() {
       this.currentIndex = -1;
+    },
+    goSearch(event) {
+      // 第一個問題: 把子節點當中a標籤，加上自訂義屬性 data-categoryName，其餘的子節點是沒有的
+      let element = event.target;
+      // 獲取到當前發這個事件的節點【h3、a、dt、d1】，需要帶有 data-categoryName這樣節點【一定是a標籤】
+      // 節點有一個屬性dataset屬性，可以獲取節點的自訂義屬性與屬性值
+      let { categoryname, category1id, category2id, category3id } =
+        element.dataset;
+      // 如果標籤身上擁有 categorynameu一定是a標籤
+      if (categoryname) {
+        // 整理路由跳轉的參數
+        let location = { name: "search" };
+        let query = { categoryName: categoryname };
+        // 區別是一級分類、二級分類、三級分類的a標籤
+        if (category1id) {
+          query.category1id = category1id;
+        } else if (category2id) {
+          query.category2id = category2id;
+        } else {
+          query.category3id = category3id;
+        }
+        // 整理完參數
+        location.query = query;
+        // 路由跳轉
+        this.$router.push(location);
+      }
     },
   },
 };
