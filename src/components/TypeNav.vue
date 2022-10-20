@@ -1,20 +1,20 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <div @mouseleave="leaveIndex()">
+      <div @mouseleave="leaveShow" @mouseenter="enterShow">
         <h2 class="all">全部商品分類</h2>
         <!-- 三级联动结构||过渡动画效果-->
         <transition name="sort">
           <div class="sort" v-show="show">
+            <!-- 事件的委派更加合理一些 -->
             <div class="all-sort-list2" @click="goSearch">
               <div
                 class="item"
                 v-for="(c1, index) in categoryList"
                 :key="c1.categoryId"
                 @mouseenter="changeIndex(index)"
-                :class="{ cur: currentIndex == index }"
               >
-                <h3>
+                <h3 :class="{ show: currentIndex === index }">
                   <a
                     :data-categoryName="c1.categoryName"
                     :data-category1Id="c1.categoryId"
@@ -24,14 +24,16 @@
                 <!-- 二級與三級分類 -->
                 <div
                   class="item-list clearfix"
-                  :style="{ display: currentIndex == index ? 'block' : 'none' }"
+                  :style="{
+                    display: currentIndex === index ? 'block' : 'none',
+                  }"
                 >
                   <div
                     class="subitem"
                     v-for="(c2, index) in c1.categoryChild"
                     :key="c2.categoryId"
                   >
-                    <div class="fore">
+                    <dl class="fore">
                       <dt>
                         <a
                           :data-categoryName="c2.categoryName"
@@ -51,7 +53,7 @@
                           >
                         </em>
                       </dd>
-                    </div>
+                    </dl>
                   </div>
                 </div>
               </div>
@@ -74,39 +76,39 @@
 </template>
 
 <script>
+//按需引入：只是把需要的功能引入进来  ||  import _ from "lodash" 全部引入
+import throttle from "lodash/throttle";
 import { mapState } from "vuex";
-import _ from "lodash";
-console.log(_.throttle);
 export default {
   name: "TypeNav",
   data() {
     return {
       // 存儲用戶鼠標位置
       currentIndex: -1,
+      // 控制菜單顯示與隱藏
       show: true,
     };
   },
   mounted() {
-    // 通知vuex發API，獲取數據，存儲在倉庫當中
-    this.$store.dispatch("categoryList");
+    // 當組件掛載完畢，讓SHOW屬性變為false
+    // 如果不是home路由組件，將typeNav進行隱藏
+    if (this.$route.path != "/home") {
+      this.show = false;
+    }
   },
   computed: {
+    // 右側需要的是一個函數，當使用這個計算屬性的時候，右側函數會立即執行一次
+    // 注入一個參數state，就是大倉庫的數據
     ...mapState({
-      // 右側需要的是一個函數，當使用這個計算屬性的時候，右側函數會立即執行一次
-      // 注入一個參數state，就是大倉庫的數據
-      categoryList: (state) => {
-        return state.home.categoryList;
-      },
+      categoryList: (state) => state.home.categoryList,
     }),
   },
   methods: {
     // 鼠標進入修改響應式數據currentIndex數據
-    changeIndex: _.throttle(function (index) {
+    // throttle 節流功能
+    changeIndex: throttle(function (index) {
       this.currentIndex = index;
-    }, 50),
-    leaveIndex() {
-      this.currentIndex = -1;
-    },
+    }, 20),
     goSearch(event) {
       // 第一個問題: 把子節點當中a標籤，加上自訂義屬性 data-categoryName，其餘的子節點是沒有的
       let element = event.target;
@@ -119,18 +121,43 @@ export default {
         // 整理路由跳轉的參數
         let location = { name: "search" };
         let query = { categoryName: categoryname };
-        // 區別是一級分類、二級分類、三級分類的a標籤
+
         if (category1id) {
-          query.category1id = category1id;
+          query.category1Id = category1id;
         } else if (category2id) {
-          query.category2id = category2id;
+          query.category2Id = category2id;
         } else {
-          query.category3id = category3id;
+          query.category3Id = category3id;
         }
-        // 整理完參數
-        location.query = query;
-        // 路由跳轉
-        this.$router.push(location);
+        // 路由跳轉之前: 看一下有沒有params參數，如果有params參數需要攜帶給search組件。
+        if (this.$route.params) {
+          //query参数
+          location.query = query;
+          //params
+          location.params = this.$route.params;
+          //如有有params參數也需要携带给search組件
+          //home->search確實需要紀錄歷史
+          //search->search不需要存儲歷史紀錄
+          if (this.$route.path != "/home") {
+            this.$router.replace(location);
+          } else {
+            this.$router.push(location);
+          }
+        }
+      }
+    },
+    // 鼠標移入的時候，顯示商品列表
+    enterShow() {
+      if (this.$route.path != "/home") {
+        this.show = true;
+      }
+    },
+    // 鼠標離開的時候，隱藏商品列表
+    leaveShow() {
+      this.currentIndex = -1;
+      // 判斷如果是 searh路由組件的時候才執行
+      if (this.$route.path != "/home") {
+        this.show = false;
       }
     },
   },
@@ -256,9 +283,6 @@ export default {
               }
             }
           }
-        }
-        .cur {
-          background-color: lightblue;
         }
       }
     }

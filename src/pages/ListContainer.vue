@@ -77,9 +77,19 @@
   </div>
 </template>
 
-<script>
+<script></script>
+import { mapState } from "vuex";
 export default {
   name: "ListContainer",
+  mounted() {
+    // 通過vuex發起ajax請求 (mock模擬數據)，將數據存在倉庫當中
+    this.$store.dispatch("getBannerList");
+  },
+  computed: {
+    ...mapState({
+      bannerList: (state) => state.home.bannerList,
+    }),
+  },
 };
 </script>
 

@@ -61,11 +61,14 @@ export default {
   methods: {
     // 搜尋按鈕的回調函數； 需要向search路由進行跳轉
     goSearch() {
-      this.$router.push({
-        name: "search",
-        params: { keyword: this.keyword },
-        query: { k: this.keyword.toUpperCase() },
-      });
+      if (this.$route.query) {
+        let loction = {
+          name: "search",
+          params: { keyword: this.keyword || undefined },
+        };
+        loction.query = this.$route.query;
+        this.$router.push(loction);
+      }
     },
   },
 };

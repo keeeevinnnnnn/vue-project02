@@ -16,16 +16,11 @@ export default {
     Footer,
     Header,
   },
+  mounted() {
+    // 通知vuex發API，獲取數據，存儲在倉庫當中
+    this.$store.dispatch("categoryList");
+  },
 };
 </script>
 
-<style>
-/* #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-} */
-</style>
+<style></style>

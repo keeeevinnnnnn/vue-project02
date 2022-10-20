@@ -1,12 +1,16 @@
 // home組件的小倉庫
-import { reqCategoryList } from "../../api";
+import { reqCategoryList, reqBannerList } from "../../api";
 const state = {
   categoryList: [],
+  bannerList: [],
 };
 const mutations = {
   CATEGORYLIST(state, categoryList) {
     // 這裡的categoryList參數 = commit傳過來的res.data
     state.categoryList = categoryList;
+  },
+  GETBANNERLIST(state, bannerList) {
+    state.bannerList = bannerList;
   },
 };
 const actions = {
@@ -19,6 +23,13 @@ const actions = {
         commit("CATEGORYLIST", res.data);
       }
     });
+  },
+  // 獲取首頁輪播圖的數據
+  async getBannerList({ commit }) {
+    let result = await reqBannerList();
+    if (result.code == 200) {
+      commit("GETBANNERLIST", result.data);
+    }
   },
 };
 const getters = {};
