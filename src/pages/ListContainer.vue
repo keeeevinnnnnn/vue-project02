@@ -3,6 +3,17 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--全局轮播图组件-->
+        <div class="swiper-container" id="mySwiper">
+          <div class="swiper-wrapper">
+            <div
+              class="swiper-silde"
+              v-for="(v, i) in bannerList"
+              :key="bannerList.id"
+            >
+              <img :src="v.imgUrl" alt="" />
+            </div>
+          </div>
+        </div>
       </div>
       <div class="right">
         <div class="news">
@@ -79,6 +90,7 @@
 
 <script>
 import { mapState } from "vuex";
+import Swiper from "swiper";
 export default {
   name: "ListContainer",
   mounted() {
@@ -89,6 +101,34 @@ export default {
     ...mapState({
       bannerList: (state) => state.home.bannerList,
     }),
+  },
+  watch: {
+    // 監聽bannerList數據的變化: 因為這條數據發生過變化，由空數組變為數組裡有四個元素
+    bannerList: {
+      handler(newValue, oldValue) {
+        // 現在通過watch監聽bannerList屬性的屬性值變化
+        // 如果執行handler方法，代表組件實例這個屬性的屬性已經有了【數組: 四個元素】
+        // 當前這個函數執行: 只能保證bannerList數據已經有了，但是你沒辦法保證v-for已經執行結束了
+        // watch + nextTick: 數據監聽: 監聽已有數據變化
+        this.$nextTick(() => {
+          // 當你執行這個回調的時候: 保證服務器的數據回來了，v-for執行完畢了【輪播圖的結構一定有了】
+          new Swiper(document.querySelector(".swiper-container"), {
+            loop: true,
+            // 如果需要分頁器
+            pagination: {
+              el: ".swiper-pagination",
+              // 點擊小球的時候也切換圖片
+              clickable: true,
+            },
+            // 如果需要前進後退按鈕
+            navigation: {
+              nextEl: ".swiper-button-next",
+              prevEl: ".swiper-button-prev",
+            },
+          });
+        });
+      },
+    },
   },
 };
 </script>

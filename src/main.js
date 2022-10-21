@@ -7,6 +7,9 @@ import TypeNav from "./components/TypeNav";
 import store from "./store";
 // 引入mock模擬數據
 import "./mock/mockServer";
+// 引入swiper樣式
+import "swiper/swiper-bundle.min.css";
+import "swiper/swiper.min.css";
 
 // 第一個參數:全局組件的名字，第二個參數:哪一個組件
 Vue.component(TypeNav.name, TypeNav);
