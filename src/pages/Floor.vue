@@ -2,11 +2,11 @@
   <div class="floor">
     <div class="py-container">
       <div class="title clearfix">
-        <h3 class="fl"></h3>
+        <h3 class="fl">{{ floor.name }}</h3>
         <div class="fr">
           <ul class="nav-tabs clearfix">
-            <li>
-              <a href="#tab1" data-toggle="tab"></a>
+            <li class="active" v-for="(v, i) in floor.navList" :key="i">
+              <a href="#tab1" data-toggle="tab">{{ v.text }}</a>
             </li>
           </ul>
         </div>
@@ -16,32 +16,33 @@
           <div class="floor-1">
             <div class="blockgary">
               <ul class="jd-list">
-                <li></li>
+                <li v-for="(v, i) in floor.keywords" :key="i">{{ v }}</li>
               </ul>
-              <img />
+              <img :src="floor.imgUrl" />
             </div>
             <div class="floorBanner">
-              <!-- 轮播图的地方 -->
+              <!-- 輪播圖的地方 -->
+              <Carousel :bannerList="floor.carouselList" />
             </div>
             <div class="split">
               <span class="floor-x-line"></span>
               <div class="floor-conver-pit">
-                <img src="../assets/floor-1-1.png" />
+                <img :src="floor.recommendList[0]" />
               </div>
               <div class="floor-conver-pit">
-                <img src="../assets/floor-1-2.png" />
+                <img :src="floor.recommendList[1]" />
               </div>
             </div>
             <div class="split center">
-              <img src="../assets/floor-1-3.png" />
+              <img :src="floor.bigImg" />
             </div>
             <div class="split">
               <span class="floor-x-line"></span>
               <div class="floor-conver-pit">
-                <img src="../assets/floor-1-4.png" />
+                <img :src="floor.recommendList[3]" />
               </div>
               <div class="floor-conver-pit">
-                <img src="../assets/floor-1-5.png" />
+                <img :src="floor.recommendList[4]" />
               </div>
             </div>
           </div>
@@ -52,8 +53,11 @@
 </template>
 
 <script>
+import Carousel from "@/components/Carousel.vue";
 export default {
   name: "Floor",
+  props: ["floor"],
+  components: { Carousel },
 };
 </script>
 

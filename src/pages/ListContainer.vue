@@ -3,17 +3,7 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--全局轮播图组件-->
-        <div class="swiper-container" id="mySwiper">
-          <div class="swiper-wrapper">
-            <div
-              class="swiper-silde"
-              v-for="(v, i) in bannerList"
-              :key="bannerList.id"
-            >
-              <img :src="v.imgUrl" alt="" />
-            </div>
-          </div>
-        </div>
+        <Carousel :bannerList="bannerList" />
       </div>
       <div class="right">
         <div class="news">
@@ -112,7 +102,7 @@ export default {
         // watch + nextTick: 數據監聽: 監聽已有數據變化
         this.$nextTick(() => {
           // 當你執行這個回調的時候: 保證服務器的數據回來了，v-for執行完畢了【輪播圖的結構一定有了】
-          new Swiper(document.querySelector(".swiper-container"), {
+          var mySwiper = new Swiper(this.$refs.mySwiper, {
             loop: true,
             // 如果需要分頁器
             pagination: {
