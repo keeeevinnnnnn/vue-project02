@@ -71,6 +71,12 @@ export default {
       }
     },
   },
+  mounted() {
+    // 通過eventbus清除關鍵字
+    this.$bus.$on("clear", () => {
+      this.keyword = "";
+    });
+  },
 };
 </script>
 

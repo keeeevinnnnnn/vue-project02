@@ -5,13 +5,13 @@
         <div class="fl key brand">品牌</div>
         <div class="value logos">
           <ul class="logo-list">
-            <!-- 展示品牌的地方：遍历 -->
+            <!-- 展示品牌的地方：循環 -->
             <li
-              v-for="(trademark, index) in tradeMarkList"
-              :key="trademark.tmId"
-              @click="checkTradeMark(trademark)"
+              v-for="(v, i) in trademarkList"
+              :key="v.tmId"
+              @click="checkTradeMark(v)"
             >
-              {{ trademark.tmName }}
+              {{ v.tmName }}
             </li>
           </ul>
         </div>
@@ -32,7 +32,7 @@
             <li
               v-for="(attrValue, index) in attr.attrValueList"
               :key="index"
-              @click="handler(attr, attrValue)"
+              @click="checkAttr(attr, attrValue)"
             >
               <a>{{ attrValue }}</a>
             </li>
@@ -45,8 +45,23 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "SearchSelector",
+  computed: {
+    ...mapGetters(["trademarkList", "attrsList"]),
+  },
+  methods: {
+    // 品牌的事件處理函數
+    checkTradeMark(v) {
+      // 點擊了品牌(小米)，還是需要整理參數，向服務器發請求獲取相應的數據進行顯示
+      this.$emit("tradeMarkInfo", v);
+    },
+    // 品牌售賣屬性的點擊事件
+    checkAttr(attr, attrValue) {
+      this.$emit("attrInfo", attr, attrValue);
+    },
+  },
 };
 </script>
 

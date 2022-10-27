@@ -11,19 +11,35 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <!-- 面包屑可能有也可能没有 -->
-            <!-- 產品名字的按鈕 -->
-            <li class="with-x"><i>×</i></li>
-            <!-- 用戶搜索關键字的按鈕 -->
-            <li class="with-x"><i>×</i></li>
-            <!-- 品牌的面包屑:字符串才有split方法-->
-            <li class="with-x"><i>×</i></li>
-            <!-- 展示平台属性的面包屑：平台属性存儲于數组裡面，可能有多個平台属性，一次需要遍歷 -->
-            <li class="with-x"><i>×</i></li>
+            <!-- 分類麵包屑 -->
+            <li class="with-x" v-if="searchParams.categoryName">
+              {{ searchParams.categoryName }}
+              <i @click="removeCategoryName">x</i>
+            </li>
+            <!-- 關鍵字麵包屑 -->
+            <li class="with-x" v-if="searchParams.keyword">
+              {{ searchParams.keyword }}
+              <i @click="removeKeyword">x</i>
+            </li>
+            <!-- 品牌麵包屑 -->
+            <li class="with-x" v-if="searchParams.trademark">
+              {{ searchParams.trademark.split(":")[1] }}
+              <i @click="removeTradeMark">x</i>
+            </li>
+            <!-- 平台售賣的屬性值展示 -->
+            <li
+              class="with-x"
+              v-for="(attrValue, index) in searchParams.props"
+              :key="index"
+            >
+              {{ attrValue.split(":")[1] }}
+              <i @click="removeAttr(index)">x</i>
+            </li>
           </ul>
         </div>
-
-        <!--details-->
+        <!-- selector -->
+        <SearchSelector @tradeMarkInfo="tradeMarkInfo" @attrInfo="attrInfo" />
+        <!-- details -->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
@@ -107,6 +123,12 @@ export default {
       },
     };
   },
+  // 組件掛載完畢之前執行一次【mounted之前】
+  beforeMount() {
+    // Object.assin()合并对象
+    // 再發請求之前，把api需要傳遞的參數，進行整理(在發api之前，把參數整理好，服務器就會返回查詢的數據)
+    Object.assign(this.searchParams, this.$route.query, this.$route.params);
+  },
   // 組件掛載完畢執行一次，【僅僅只執行一次】
   mounted() {
     this.getData();
@@ -118,7 +140,76 @@ export default {
     // 向服務器發請求獲取search模塊數據 (根據參數不同返回不同的數據進行展示)
     // 把這次請求封裝為一個函數: 當你需要再調用的時候調用即可
     getData() {
-      this.$store.dispatch("getSearchList", {});
+      this.$store.dispatch("getSearchList", this.searchParams);
+    },
+    // 刪除分類的名字
+    removeCategoryName() {
+      // 把帶給serve的參數置空了，還需要向服務器發請求
+      // 每一次請求完畢，應該把相應的1、2、3級分類的id置空，讓他接受下一次的相應1、2、3ID
+      // 帶給serve服務器參數可有可無的: 如果屬性值為空的字串還是會把相應的字串帶給serve。( 提升效能 )
+      // 把相應的字串變為 undefined，當前這個字串不會帶給serve。
+      this.searchParams.categoryName = "";
+      this.searchParams.category1Id = undefined;
+      this.searchParams.category2Id = undefined;
+      this.searchParams.category3Id = undefined;
+      this.getData();
+      // 再次發ajax，目前狀態是只會在mounted執行一次
+      this.getData();
+      // url也需要修改
+      // 嚴謹: 本意是刪除query，如果路徑當中出現params不應該刪除，路由跳轉的時候應該帶著
+      if (this.$route.params) {
+        this.$router.push({ name: "search", params: this.$route.params });
+      }
+    },
+    // 刪除關鍵字
+    removeKeyword() {
+      // 給serve的參數searchParams的keyword置空
+      this.searchParams.keyword = undefined;
+      // 再次發api
+      this.getData();
+      // 通知兄弟組件Header清除關鍵字
+      this.$bus.$emit("clear");
+      // 進行路由地跳轉
+      if (this.$route.query) {
+        this.$router.push({ name: "search", query: this.$route.query });
+      }
+    },
+    // 刪除品牌
+    removeTradeMark() {
+      this.searchParams.trademark = undefined;
+      this.getData();
+    },
+    // 刪除平台售賣屬性
+    removeAttr(index) {
+      // 再次整理參數
+      this.searchParams.props.splice(index, 1);
+      // 再次發請求
+      this.getData();
+    },
+    //自訂義事件回調
+    tradeMarkInfo(v) {
+      // 1. 整理品牌的參數 'ID:品牌名稱'
+      this.searchParams.trademark = `${v.tmId}:${v.tmName}`;
+      // 再次發請求獲取search模塊進行渲染
+      this.getData();
+    },
+    // 收集平台屬性回調函數 ( 自訂義事件 )
+    attrInfo(attr, attrValue) {
+      // 參數格式整理好，【屬性ID: 屬性值: 屬姓名】
+      let props = `${attr.attrId}:${attrValue}: ${attr.attrName}`;
+      // 防止同選項重複點擊 // indexOf == -1: 代表陣列裡面沒有這個value，沒有的話才push進去，再發給serve
+      if (this.searchParams.props.indexOf(props) == -1) {
+        this.searchParams.props.push(props);
+      }
+      // 再次發請求
+      this.getData();
+    },
+  },
+  // 數據監聽: 監聽組件實例身上的屬性的屬性值變化
+  watch: {
+    $route(newValue, oldValue) {
+      // 再次發請求之前整理帶給服務器參數
+      Object.assign(this.searchParams, this.$route.query, this.$route.params);
     },
   },
 };

@@ -18,6 +18,10 @@ import "swiper/swiper-bundle.min.css";
 Vue.config.productionTip = false;
 new Vue({
   render: (h) => h(App),
-  router: router,
+  // $EventBus配置
+  beforeCreate() {
+    Vue.prototype.$bus = this;
+  },
+  router,
   store,
 }).$mount("#app");
