@@ -43,14 +43,13 @@
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
-              <!-- 價格結構 -->
+              <!-- 排序的結構 -->
               <ul class="sui-nav">
-                <!-- 擁有active：會将背景颜色變為红色 -->
-                <li>
-                  <a>综合<span class="iconfont"></span></a>
+                <li :class="{ active: isOne }">
+                  <a>综合<span v-show="isOne"></span></a>
                 </li>
-                <li>
-                  <a>價格<span class="iconfont"></span></a>
+                <li :class="{ active: isTwo }">
+                  <a>價格<span v-show="isTwo"></span></a>
                 </li>
               </ul>
             </div>
@@ -115,7 +114,7 @@ export default {
         category3Id: "",
         categoryName: "",
         keyword: "",
-        order: "",
+        order: "1:desc",
         pageNo: 1,
         pageSize: 10,
         props: [],
@@ -135,6 +134,12 @@ export default {
   },
   computed: {
     ...mapGetters(["goodsList"]),
+    isOne() {
+      return this.searchParams.order.indexOf("1") != -1;
+    },
+    isTwo() {
+      return this.searchParams.order.indexOf("2") != -1;
+    },
   },
   methods: {
     // 向服務器發請求獲取search模塊數據 (根據參數不同返回不同的數據進行展示)
